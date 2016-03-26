@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="title_activity_single_item">Movie Detail</string>
+    <string name="tmdb_api_key">API KEY</string>
+    <string name="popular_movies">Popular Movies</string>
+    <string name="top_rated">Top Rated Movies</string>
+    <string name="action_sort_by">Sort by</string>
+    <string name="action_sort_by_popularity">Most Popular</string>
+    <string name="action_sort_by_rating">Top Rated</string>
+</resources>
