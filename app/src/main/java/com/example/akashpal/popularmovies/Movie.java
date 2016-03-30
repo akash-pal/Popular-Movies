@@ -22,7 +22,7 @@ public class Movie implements Parcelable {
     }
 
     Movie(JSONObject movie) throws JSONException {
-        id = movie.getString(Constants.TAG_TITLE);
+        id = movie.getString(Constants.TAG_ID);
         title = movie.getString(Constants.TAG_TITLE);
         poster_path = movie.getString(Constants.TAG_POSTER_PATH);
         release_date = movie.getString(Constants.TAG_RELEASE_DATE);

@@ -7,4 +7,5 @@
     <string name="action_sort_by">Sort by</string>
     <string name="action_sort_by_popularity">Most Popular</string>
     <string name="action_sort_by_rating">Top Rated</string>
+    <string name="title_activity_main2">Main2Activity</string>
 </resources>

@@ -4,7 +4,7 @@ package com.example.akashpal.popularmovies;
  * Created by akash pal on 3/17/2016.
  */
 public class Constants {
-
+    public static final String TAG_ID = "id";
     public static final String TAG_TITLE = "title";
     public static final String TAG_POSTER_PATH = "poster_path";
     public static final String TAG_RELEASE_DATE = "release_date";
@@ -22,6 +22,9 @@ public class Constants {
     public static final String BASE_URL = "http://image.tmdb.org/t/p/w185";
 
     public static final String DETAIL_MOVIE = "DETAIL_MOVIE";
+
+    public static final String TAG_REVIEW_RESULTS = "results";
+    public static final String TAG_REVIEW_CONTENT = "content";
 
 
 }
