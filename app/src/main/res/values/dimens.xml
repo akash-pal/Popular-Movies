@@ -5,4 +5,7 @@
     <dimen name="grad_margin">8dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="toolabr_height">4dp</dimen>
+
+    <dimen name="text_size">16sp</dimen>
+    <dimen name="movie_detail_trailers_height">240dp</dimen>
 </resources>

@@ -49,4 +49,25 @@ public class JSONParser {
         }
         return null;
     }
+
+
+    public static JSONObject getTrailerById(int movieId) {
+        Log.v(TAG,movieId+" ");
+        String trailer_url = "http://api.themoviedb.org/3/movie/" + movieId + "/videos?api_key=caf08658054207c90c60ebe8dde96b31";
+
+        try {
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+                    .url(trailer_url)
+                    .build();
+
+            response = client.newCall(request).execute();
+            return new JSONObject(response.body().string());
+
+        } catch (IOException | JSONException e) {
+            Log.e(TAG, "" + e.getLocalizedMessage());
+        }
+        return null;
+    }
 }

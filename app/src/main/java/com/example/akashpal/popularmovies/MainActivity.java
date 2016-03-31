@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
+import com.example.akashpal.popularmovies.model.Movie;
+
 public class MainActivity extends AppCompatActivity implements MainActivityFragment.Callback{
 
     private boolean mTwoPane;

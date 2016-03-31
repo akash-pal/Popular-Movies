@@ -1,5 +1,7 @@
 package com.example.akashpal.popularmovies;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +17,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
+
+import com.example.akashpal.popularmovies.adapter.MovieGridAdapter;
+import com.example.akashpal.popularmovies.data.MovieContract;
+import com.example.akashpal.popularmovies.model.Movie;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,6 +50,7 @@ public class MainActivityFragment extends Fragment {
     private static final String POPULARITY_DESC = "popularity.desc";
     private static final String RATING_DESC = "vote_average.desc";
     private String sort_title = Constants.POPULAR;
+    private static final String FAVORITE = "favorite";
 
     public interface Callback {
         void onItemSelected(Movie movie);
@@ -101,6 +108,7 @@ public class MainActivityFragment extends Fragment {
 
         MenuItem action_sort_by_popularity = menu.findItem(R.id.action_sort_by_popularity);
         MenuItem action_sort_by_rating = menu.findItem(R.id.action_sort_by_rating);
+        MenuItem action_sort_by_favorite = menu.findItem(R.id.action_sort_by_favorite);
 
         if (mSortBy.contentEquals(POPULARITY_DESC)) {
             if (!action_sort_by_popularity.isChecked()) {
@@ -109,6 +117,10 @@ public class MainActivityFragment extends Fragment {
         } else if (mSortBy.contentEquals(RATING_DESC)) {
             if (!action_sort_by_rating.isChecked()) {
                 action_sort_by_rating.setChecked(true);
+            }
+        }else if (mSortBy.contentEquals(FAVORITE)) {
+            if (!action_sort_by_popularity.isChecked()) {
+                action_sort_by_favorite.setChecked(true);
             }
         }
 
@@ -154,6 +166,17 @@ public class MainActivityFragment extends Fragment {
                 updateMovies(mSortBy);
                 return true;
 
+            case R.id.action_sort_by_favorite:
+                if (item.isChecked()) {
+                    item.setChecked(false);
+                } else {
+                    item.setChecked(true);
+                }
+                mSortBy = FAVORITE;
+                updateMovies(mSortBy);
+                return true;
+
+
         }
         return super.onOptionsItemSelected(item);
 
@@ -161,8 +184,62 @@ public class MainActivityFragment extends Fragment {
 
 
     private void updateMovies(String sort_by) {
-        new FetchMoviesTask().execute(sort_by);
+
+        if (!sort_by.contentEquals(FAVORITE)) {
+            new FetchMoviesTask().execute(sort_by);
+        } else {
+            new FetchFavoriteMoviesTask(getActivity()).execute();
+        }
+
     }
+
+
+
+    public class FetchFavoriteMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
+
+        private Context mContext;
+
+        public FetchFavoriteMoviesTask(Context context) {
+            mContext = context;
+        }
+
+        private List<Movie> getFavoriteMoviesDataFromCursor(Cursor cursor) {
+            List<Movie> results = new ArrayList<>();
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    Movie movie = new Movie(cursor);
+                    results.add(movie);
+                } while (cursor.moveToNext());
+                cursor.close();
+            }
+            return results;
+        }
+
+        @Override
+        protected List<Movie> doInBackground(Void... params) {
+            Cursor cursor = mContext.getContentResolver().query(
+                    MovieContract.MovieEntry.CONTENT_URI,
+                    Constants.MOVIE_COLUMNS,
+                    null,
+                    null,
+                    null
+            );
+            return getFavoriteMoviesDataFromCursor(cursor);
+        }
+
+        @Override
+        protected void onPostExecute(List<Movie> movies) {
+
+            if (movies != null) {
+                if (movieGridAdapter != null) {
+                    movieGridAdapter.setData(movies);
+                }
+                movieList = new ArrayList<>();
+                movieList.addAll(movies);
+            }
+        }
+    }
+
 
 
     public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
