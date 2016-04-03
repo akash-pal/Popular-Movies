@@ -2,7 +2,6 @@ package com.example.akashpal.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,12 +25,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,19 +34,15 @@ import java.util.List;
 public class MainActivityFragment extends Fragment {
 
     public static final String TAG = MainActivityFragment.class.getSimpleName();
-
     private String mSortBy = Constants.SORT_BY_POPULAR;
     ArrayList<Movie> movieList = null;
     GridView mGridView;
     MovieGridAdapter movieGridAdapter;
-
-    private static final String POPULARITY_DESC = "popularity.desc";
-    private static final String RATING_DESC = "vote_average.desc";
     private String sort_title = Constants.POPULAR;
-    private static final String FAVORITE = "favorite";
 
     public interface Callback {
         void onItemSelected(Movie movie);
+
         void onFragmentInteraction(String title);
     }
 
@@ -68,20 +57,27 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-
         mGridView = (GridView) view.findViewById(R.id.moviesGrid);
+
         movieGridAdapter = new MovieGridAdapter(getActivity(), new ArrayList<Movie>());
         mGridView.setAdapter(movieGridAdapter);
 
         if (savedInstanceState == null) {
+            Log.v(TAG, savedInstanceState + " is null ");
             updateMovies(mSortBy);
         } else {
-            mSortBy = savedInstanceState.getString(Constants.SORT_KEY);
-            sort_title = savedInstanceState.getString(Constants.SORT_TITLE);
-            Log.v(TAG, "Restored" + sort_title);
-            updateMovies(mSortBy);
+            if (savedInstanceState.containsKey(Constants.SORT_KEY)) {
+                mSortBy = savedInstanceState.getString(Constants.SORT_KEY);
+            }
+            if (savedInstanceState.containsKey(Constants.MOVIES_KEY)) {
+                //get your data saved and populate the adapter here
+                movieList = savedInstanceState.getParcelableArrayList(Constants.MOVIES_KEY);
+                movieGridAdapter.setData(movieList);
+                updateMovies(mSortBy);
+            } else {
+                updateMovies(mSortBy);
+            }
         }
-
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -89,54 +85,51 @@ public class MainActivityFragment extends Fragment {
                 ((Callback) getActivity()).onItemSelected(movie);
             }
         });
-
         return view;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         Log.v(TAG, "saved instance" + mSortBy);
-        outState.putString(Constants.SORT_KEY, mSortBy);
-        outState.putString(Constants.SORT_TITLE, sort_title);
+        if (!mSortBy.contentEquals(Constants.SORT_BY_POPULAR)) {
+            outState.putString(Constants.SORT_KEY, mSortBy);
+        }
+        if (movieList != null) {
+            outState.putParcelableArrayList(Constants.MOVIES_KEY, movieList);
+        }
         super.onSaveInstanceState(outState);
     }
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_fragment_main, menu);
 
+        inflater.inflate(R.menu.menu_fragment_main, menu);
         MenuItem action_sort_by_popularity = menu.findItem(R.id.action_sort_by_popularity);
         MenuItem action_sort_by_rating = menu.findItem(R.id.action_sort_by_rating);
         MenuItem action_sort_by_favorite = menu.findItem(R.id.action_sort_by_favorite);
-
-        if (mSortBy.contentEquals(POPULARITY_DESC)) {
+        if (mSortBy.contentEquals(Constants.SORT_BY_POPULAR)) {
             if (!action_sort_by_popularity.isChecked()) {
                 action_sort_by_popularity.setChecked(true);
             }
-        } else if (mSortBy.contentEquals(RATING_DESC)) {
+        } else if (mSortBy.contentEquals(Constants.SORT_BY_TOP_RATED)) {
             if (!action_sort_by_rating.isChecked()) {
                 action_sort_by_rating.setChecked(true);
             }
-        }else if (mSortBy.contentEquals(FAVORITE)) {
-            if (!action_sort_by_popularity.isChecked()) {
+        } else if (mSortBy.contentEquals(Constants.SORT_BY_FAVORITE)) {
+            if (!action_sort_by_favorite.isChecked()) {
                 action_sort_by_favorite.setChecked(true);
             }
         }
-
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(getActivity());
                 return true;
             case R.id.action_sort_by_popularity:
-
                 if (item.isChecked()) {
                     item.setChecked(false);
                 } else {
@@ -145,58 +138,46 @@ public class MainActivityFragment extends Fragment {
                 sort_title = Constants.POPULAR;
                 ((Callback) getActivity()).onFragmentInteraction(sort_title);
                 mSortBy = Constants.SORT_BY_POPULAR;
-
-                Toast.makeText(getActivity(),Constants.POPULAR, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), Constants.POPULAR, Toast.LENGTH_SHORT).show();
                 updateMovies(mSortBy);
                 return true;
-
             case R.id.action_sort_by_rating:
-
                 if (item.isChecked()) {
                     item.setChecked(false);
                 } else {
                     item.setChecked(true);
                 }
-
                 sort_title = Constants.TOP_RATED;
                 ((Callback) getActivity()).onFragmentInteraction(sort_title);
                 mSortBy = Constants.SORT_BY_TOP_RATED;
-
-                Toast.makeText(getActivity(),Constants.TOP_RATED, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), Constants.TOP_RATED, Toast.LENGTH_SHORT).show();
                 updateMovies(mSortBy);
                 return true;
-
             case R.id.action_sort_by_favorite:
                 if (item.isChecked()) {
                     item.setChecked(false);
                 } else {
                     item.setChecked(true);
                 }
-                mSortBy = FAVORITE;
+                sort_title = Constants.FAVORITE;
+                ((Callback) getActivity()).onFragmentInteraction(sort_title);
+                mSortBy = Constants.SORT_BY_FAVORITE;
+                Toast.makeText(getActivity(), Constants.FAVORITE, Toast.LENGTH_SHORT).show();
                 updateMovies(mSortBy);
                 return true;
-
-
         }
         return super.onOptionsItemSelected(item);
-
     }
 
-
     private void updateMovies(String sort_by) {
-
-        if (!sort_by.contentEquals(FAVORITE)) {
+        if (!sort_by.contentEquals(Constants.SORT_BY_FAVORITE)) {
             new FetchMoviesTask().execute(sort_by);
         } else {
             new FetchFavoriteMoviesTask(getActivity()).execute();
         }
-
     }
 
-
-
     public class FetchFavoriteMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
-
         private Context mContext;
 
         public FetchFavoriteMoviesTask(Context context) {
@@ -229,7 +210,6 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(List<Movie> movies) {
-
             if (movies != null) {
                 if (movieGridAdapter != null) {
                     movieGridAdapter.setData(movies);
@@ -240,90 +220,27 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
-
-
     public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
-
-        private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
-
-        private List<Movie> getMoviesDataFromJson(String jsonStr) throws JSONException {
-            JSONObject movieJson = new JSONObject(jsonStr);
-            JSONArray movieArray = movieJson.getJSONArray("results");
-
-            List<Movie> results = new ArrayList<>();
-
-            for (int i = 0; i < movieArray.length(); i++) {
-                JSONObject movie = movieArray.getJSONObject(i);
-                Movie movieModel = new Movie(movie);
-                results.add(movieModel);
-            }
-
-            return results;
-        }
-
         @Override
         protected List<Movie> doInBackground(String... params) {
-
-            if (params.length == 0) {
-                return null;
-            }
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-            String jsonStr = null;
-
-            try {
-                final String BASE_URL = "http://api.themoviedb.org/3/movie";
-                final String API_KEY_PARAM = "api_key";
-
-                Uri builtUri = Uri.parse(BASE_URL).buildUpon().appendPath(params[0])
-                        .appendQueryParameter(API_KEY_PARAM, getString(R.string.tmdb_api_key))
-                        .build();
-                URL url = new URL(builtUri.toString());
-
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    return null;
-                }
-                jsonStr = buffer.toString();
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
-                return null;
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
+            JSONObject movieJson = JSONParser.getMovies(params[0]);
+            Log.v(TAG, params[0] + " " + movieJson + " ");
+            if (movieJson != null) {
+                if (movieJson.length() > 0) {
                     try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
+                        JSONArray movieArray = movieJson.getJSONArray("results");
+                        List<Movie> results = new ArrayList<>();
+                        for (int i = 0; i < movieArray.length(); i++) {
+                            JSONObject movie = movieArray.getJSONObject(i);
+                            Movie movieModel = new Movie(movie);
+                            results.add(movieModel);
+                        }
+                        return results;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 }
             }
-
-            try {
-                return getMoviesDataFromJson(jsonStr);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-            }
-
             return null;
         }
 
@@ -338,5 +255,4 @@ public class MainActivityFragment extends Fragment {
             }
         }
     }
-
 }

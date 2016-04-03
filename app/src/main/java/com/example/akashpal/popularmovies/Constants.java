@@ -6,22 +6,21 @@ import com.example.akashpal.popularmovies.data.MovieContract;
  * Created by akash pal on 3/17/2016.
  */
 public class Constants {
-    public static final String TAG_ID = "id";
-    public static final String TAG_TITLE = "title";
-    public static final String TAG_POSTER_PATH = "poster_path";
-    public static final String TAG_RELEASE_DATE = "release_date";
-    public static final String TAG_VOTE_AVERAGE = "vote_average";
-    public static final String TAG_OVERVIEW = "overview";
 
     public static final String SORT_BY_POPULAR = "popular";
     public static final String SORT_BY_TOP_RATED = "top_rated";
+    public static final String SORT_BY_FAVORITE = "favorite";
     public static final String SORT_KEY = "sortkey";
     public static final String SORT_TITLE = "sortTitle";
 
     public static final String POPULAR = "Popular Movies";
     public static final String TOP_RATED = "Top Rated Movies";
+    public static final String FAVORITE = "Favorite Movies";
 
     public static final String BASE_URL = "http://image.tmdb.org/t/p/w185";
+    public static final String API_KEY = "INSERT_API_KEY";
+    public static final String BASE_URL_MOVIES = "http://api.themoviedb.org/3/movie";
+    public static final String API_KEY_PARAM = "api_key";
 
     public static final String DETAIL_MOVIE = "DETAIL_MOVIE";
 
@@ -34,6 +33,8 @@ public class Constants {
     public static final String TAG_TRAILER_NAME = "name";
     public static final String TAG_TRAILER_SITE = "site";
     public static final String TAG_TRAILER_TYPE = "type";
+
+    public static final String MOVIES_KEY = "movies_key";
 
     public static final String[] MOVIE_COLUMNS = {
             MovieContract.MovieEntry._ID,
@@ -54,8 +55,6 @@ public class Constants {
     public static final int COL_OVERVIEW = 5;
     public static final int COL_RATING = 6;
     public static final int COL_DATE = 7;
-
-
 
 
 }

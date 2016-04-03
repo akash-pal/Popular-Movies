@@ -1,8 +1,7 @@
 package com.example.akashpal.popularmovies;
 
-import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 public class DetailActivity extends AppCompatActivity {
