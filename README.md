@@ -1,5 +1,5 @@
 # Popular-Movies
-Udacity Android Nanodegree Project Popular Movies Stage 
+Udacity Android Nanodegree Project Popular Movies
 
 <ul>
 <li>Grid arrangement of movie posters.</li>
