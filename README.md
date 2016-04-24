@@ -1,5 +1,15 @@
-# Popular-Movies-Stage-1
-Udacity Android Nanodegree Project Popular Movies Stage 1
+# Popular-Movies
+Udacity Android Nanodegree Project Popular Movies Stage 
+
+<ul>
+<li>Grid arrangement of movie posters.</li>
+<li>Change sort order via a setting: The sort order is most popular, top rated and Favorite Movies.</li>
+<li>Tap on a movie poster to view details such as: </li>
+<li>Original title,movie poster image thumbnail,a plot synopsis,user rating,release date</li>
+<li>View and play trailers, Read reviews, Mark a movie as a favorite by tapping on button(star).</li> 
+<li>Lastly, optimized for app experience for tablet.</li>
+</ul>
+
 
 <b>SCREENS</b>
 <br>
